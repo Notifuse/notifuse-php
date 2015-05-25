@@ -1,0 +1,22 @@
+{
+  "name": "notifuse/notifuse-php",
+  "type": "library",
+  "description": "The Notifuse SDK provides methods for all API functions.",
+  "homepage": "https://www.notifuse.com",
+  "keywords": ["email", "sms", "push", "api", "sdk", "notification"],
+  "require": {
+    "guzzlehttp/guzzle": "~5.0",
+    "guzzlehttp/retry-subscriber": "1.0.*@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Notifuse\\": "src/"
+    }
+  },
+  "license": "MIT",
+  "authors": [{
+    "name": "Pierre Bazoge",
+    "email": "pierre@notifuse.com"
+  }],
+  "minimum-stability": "stable"
+}

@@ -1,0 +1,6 @@
+vendor
+test.php
+composer.phar
+composer.lock
+.DS_STORE
+*.log
