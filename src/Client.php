@@ -23,7 +23,7 @@ class Notifuse
   private $guzzleLogFile;
 
 
-  public function __construct($key, $options) {
+  public function __construct($key, $options = array()) {
 
     if(!$key) throw new Exception("api_key is required in notifuse options");
     
@@ -166,27 +166,28 @@ class Notifuse
     // Results is an SplObjectStorage object where each request is a key
     foreach($batchResults as $request) 
     {
-        // Get the result (either a ResponseInterface or RequestException)
-        $result = $batchResults[$request];
+      // Get the result (either a ResponseInterface or RequestException)
+      $result = $batchResults[$request];
 
-        if($result instanceof Response) 
-        {
-          try {
-            $json = $result->json();
-            if(isset($json['queued'])) $totalSuccessfullyQueued += (int) $json['queued'];
-            $return[] = $json;
-          } 
-          catch (Exception $e) {
-            $return[] = $e->getMessage();
-          }
+      if($result instanceof Response) 
+      {
+        try {
+          $json = $result->json();
+          if(isset($json['queued'])) $totalSuccessfullyQueued += (int) $json['queued'];
+          $return[] = $json;
         } 
-        else 
-        {
+        catch (Exception $e) {
           $return[] = array(
-            // Get the exception message
-            'error'=>$result->getMessage()
+            'error'=>$e->getMessage()
           );
         }
+      } 
+      else 
+      {
+        $return[] = array(
+          'error'=>$result->getMessage()
+        );
+      }
     }
 
 
