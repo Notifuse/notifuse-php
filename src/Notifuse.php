@@ -9,7 +9,7 @@ use GuzzleHttp\Client,
 
 class Notifuse
 {
-  public static $VERSION = '1.0';
+  public static $VERSION = '1.1';
 
   public static $API_VERSION = 'v1';
 
