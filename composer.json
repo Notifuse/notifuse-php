@@ -5,6 +5,7 @@
   "homepage": "https://www.notifuse.com",
   "keywords": ["email", "sms", "push", "api", "sdk", "notification"],
   "require": {
+    "php": ">=5.4.0",
     "guzzlehttp/guzzle": "~5.0",
     "guzzlehttp/retry-subscriber": "1.0.*@dev"
   },

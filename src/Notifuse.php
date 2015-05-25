@@ -185,23 +185,6 @@ class Notifuse
       );
     }
 
-    // // Results is an SplObjectStorage object where each request is a key
-    // foreach($batchResults as $request) 
-    // {
-    //   // Get the result (either a ResponseInterface or RequestException)
-    //   $result = $batchResults[$request];
-
-    //   if($result instanceof Response) 
-    //   {
-
-    //   } 
-    //   else 
-    //   {
-
-    //   }
-    // }
-
-
     $this->log('All batch sent.');
 
     // reset messages to send
