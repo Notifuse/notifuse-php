@@ -2,6 +2,7 @@
 namespace Notifuse;
 
 use GuzzleHttp\Client,
+    GuzzleHttp\Pool,
     GuzzleHttp\Message\Response,
     GuzzleHttp\Event\AbstractTransferEvent,
     GuzzleHttp\Subscriber\Retry\RetrySubscriber;
@@ -158,37 +159,47 @@ class Notifuse
 
 
     // execute the batch of requests
-    $batchResults = GuzzleHttp\batch($this->guzzleClient, $requests, ['parallel'=>$this->settings['max_parallel']]);
+    $batchResults = Pool::batch($this->guzzleClient, $requests, ['pool_size'=>$this->settings['max_parallel']]);
 
     $return = array();
     $totalSuccessfullyQueued = 0;
 
-    // Results is an SplObjectStorage object where each request is a key
-    foreach($batchResults as $request) 
-    {
-      // Get the result (either a ResponseInterface or RequestException)
-      $result = $batchResults[$request];
-
-      if($result instanceof Response) 
-      {
-        try {
-          $json = $result->json();
-          if(isset($json['queued'])) $totalSuccessfullyQueued += (int) $json['queued'];
-          $return[] = $json;
-        } 
-        catch (Exception $e) {
-          $return[] = array(
-            'error'=>$e->getMessage()
-          );
-        }
+    // Retrieve all successful responses
+    foreach($batchResults->getSuccessful() as $response) {
+      try {
+        $json = $response->json();
+        if(isset($json['queued'])) $totalSuccessfullyQueued += (int) $json['queued'];
+        $return[] = $json;
       } 
-      else 
-      {
+      catch (Exception $e) {
         $return[] = array(
-          'error'=>$result->getMessage()
+          'error'=>$e->getMessage()
         );
       }
     }
+
+    // Retrieve all failures.
+    foreach($batchResults->getFailures() as $requestException) {
+      $return[] = array(
+        'error'=>$requestException->getMessage()
+      );
+    }
+
+    // // Results is an SplObjectStorage object where each request is a key
+    // foreach($batchResults as $request) 
+    // {
+    //   // Get the result (either a ResponseInterface or RequestException)
+    //   $result = $batchResults[$request];
+
+    //   if($result instanceof Response) 
+    //   {
+
+    //   } 
+    //   else 
+    //   {
+
+    //   }
+    // }
 
 
     $this->log('All batch sent.');
