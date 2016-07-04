@@ -34,6 +34,7 @@ $client = new NotifuseClient($api_key, $options);
 | max_attempts     | Max retry attempts. Default: 3                        |
 | retry_delay      | Delay between each retry attemps in ms. Default: 500  |
 | proxy            | Guzzle6 proxy settings. Default: NULL                 |
+| verify_ssl       | Verify SSL cert. Default: true                        |
 
 ### Upsert contacts
 ```php
@@ -82,8 +83,8 @@ $myMessage = array(
       'lastName' => 'Doe'
     )
   ),
-  templateData => array(
-    _verificationToken => 'xxx'
+  'templateData' => array(
+    '_verificationToken' => 'xxx'
   ) 
 );
 
@@ -119,7 +120,7 @@ try {
 
 ## Exceptions
 
-The Notifuse client will throw exceptions for connection errors and API errors (400, 401, 500...).
+The Notifuse client will throw exceptions for connection errors and API errors (400 Bad Request, 401 Unauthorized, 500 Internal Server Error...).
 
 ## Support
 
