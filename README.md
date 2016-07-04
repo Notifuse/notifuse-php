@@ -1,105 +1,130 @@
-Notifuse-php
-===========
+# PHP library for the Notifuse API
 
-This is the official Notifuse PHP SDK.
+[Notifuse](https://notifuse.com) connects all your notification channels (SenGrid, Mailgun, Twilio SMS, Slack, push...) to a powerful API/platform that handles templating, contacts segmentation and smart campaigns.
 
-Notifuse is a multi-channel notification platform (email, sms, push...) https://www.notifuse.com
+We recommend you to read the [API Reference](https://notifuse.com/docs/api) to understand the behavior and results of every methods.
 
+## Installation
 
-Installation
-------------
-To install the SDK, you will need to be using [Composer](http://getcomposer.org/) 
-in your project. 
-If you aren't using Composer yet, it's really simple! Here's how to install 
-composer and the Mailgun SDK.
+This library is available as a Composer package.
 
-```PHP
-# Install Composer
-curl -sS https://getcomposer.org/installer | php
-
-# Add Notifuse as a dependency
-php composer.phar require notifuse/notifuse-php:~1.1
-``` 
-
-
-Then, require Composer's autoloader in your application to automatically 
-load the Notifuse SDK in your project:
-```PHP
-require 'vendor/autoload.php';
-use Notifuse\Notifuse;
+```bashp
+composer require notifuse/notifuse-php
 ```
 
-Usage
------
-Here's how to send a message using the SDK:
+## Usage
+
+You need your project API key to init the Notifuse client.
 
 ```php
-# Default options
-$options = array(
-    host         => 'https://api.notifuse.com',
-    debug        => false,
-    ssl_check    => false,
-    timeout      => 10,
-    max_retry    => 1,
-    max_parallel => 10
+require 'vendor/autoload.php';
+
+use Notifuse\NotifuseClient;
+
+$client = new NotifuseClient($api_key, $options);
+```
+
+### Client options
+
+| Key              | Expected value.                                       |
+|------------------|-------------------------------------------------------|
+| logger           | Logger compatible with LoggerInterface. Default: NULL |
+| request_timeout  | Timeout for the API connection in secs. Default: 3    |
+| response_timeout | Timeout for the API response in secs. Default: 3      |
+| max_attempts     | Max retry attempts. Default: 3                        |
+| retry_delay      | Delay between each retry attemps in ms. Default: 500  |
+| proxy            | Guzzle6 proxy settings. Default: NULL                 |
+
+### Upsert contacts
+```php
+
+// upsert an array of contacts
+
+$myContact = array(
+  'id' => '123',
+  'profile' => array(
+    '$set' => array(
+      'firstName' => 'John',
+      'lastName' => 'Doe',
+      'email' => 'john@yopmail.com'
+    )
+  )
 );
 
-# First, instantiate the SDK with your API key. 
-$notifuse = new Notifuse("my-api-key", $options);
-
-# You can also attach a logger (i.e winston)
-$notifuse->setLogger($winston);
-
-# Add a message to send
-$notifuse->addMessage(array(
-  'key' => 'template_key', // template_key available in your Notifuse backend
-  'contactId' => '123',
-  'contactData' => array(
-    'firstName' => 'John',
-    'lastName' => 'Rambo',
-    'age' => 26,
-    'newsletter' => true,
-    'signedUp' => 'date_2015-06-26' // prefix date fields value with date_
-  ),
-  'mailgun' => array(
-    'email' => 'john@rambo.com'
-  ),
-  'templateData' => array(
-    'key' => 'value',
-    'number' => 20,
-    'posts' => array()
-  )
-));
-
-# Send messages (in parallel batches of 10 messages)
-$results = $notifuse->sendMessages();
-```
-
-Response
---------
-
-The results are formatted as following:
-
-```
-array(5) {
-  'success' => bool(true)
-  'queued' => string(3) "1/1"
-  'max_parallel' => int(10)
-  'send_took' => string(4) "79ms"
-  'result_per_batch' => array(1) {
-    [0] => array(4) {
-      'code' => string(3) "200"
-      'success' => bool(true)
-      'queued' => array(1) {
-        ...
-      }
-      'failed' => array(0) {
-        ...
-      }
-    }
-  }
+try {
+  $results = $client->contacts->upsert(array($myContact));
+} catch (Exception $e) {
+  // handle exception
 }
+
+// $results example:
+// array( 
+//   'statusCode' => 200,
+//   'success' => true,
+//   'inserted' => [],
+//   'updated' => ['123'],
+//   'failed' => []
+// )
+
 ```
 
-It provides the number of successfully queued messages, and the response of each batch in case you sent loads of messages.
+### Send messages
+```php
 
+$myMessage = array(
+  'notification' => 'welcome',
+  'channel' => 'sendgrid-acme',
+  'template' => 'v1',
+  'contact' => '123',
+  'contactProfile' => array(
+    '$set' => array(
+      'firstName' => 'John',
+      'lastName' => 'Doe'
+    )
+  ),
+  templateData => array(
+    _verificationToken => 'xxx'
+  ) 
+);
+
+try {
+  $results = $client->messages->send(array($myMessage));
+} catch (Exception $e) {
+  // handle exception
+}
+
+// $results example:
+// array( 
+//   'statusCode' => 200,
+//   'success' => true,
+//   'queued' => [array(...)],
+//   'failed' => []
+// )
+
+```
+
+### Retrieve a message
+```php
+
+$myMessageId = 'xxxxxxxxxxxxxxxx';
+
+try {
+  $results = $client->messages->info($myMessageId);
+} catch (Exception $e) {
+  // handle exception
+}
+
+// $results is a message object defined in the API Reference
+```
+
+## Exceptions
+
+The Notifuse client will throw exceptions for connection errors and API errors (400, 401, 500...).
+
+## Support
+
+Feel free to create a new Github issue if it concerns this library, otherwise use our [contact form](https://notifuse.com/contact).
+
+## Copyright
+
+Copyright &copy; Notifuse, Inc. MIT License; see LICENSE for further details.

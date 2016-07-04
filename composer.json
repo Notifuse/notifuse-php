@@ -1,13 +1,34 @@
 {
   "name": "notifuse/notifuse-php",
+  "repositories": [{
+    "type": "composer",
+    "url": "https://packagist.org"
+  }],
   "type": "library",
-  "description": "The Notifuse SDK provides methods for all API functions.",
-  "homepage": "https://www.notifuse.com",
-  "keywords": ["email", "sms", "push", "api", "sdk", "notification"],
+  "description": "PHP client to interact with the Notifuse.com API.",
+  "homepage": "https://notifuse.com",
+  "keywords": [
+    "notifuse",
+    "notification",
+    "email",
+    "sms",
+    "push",
+    "slack",
+    "sendgrid",
+    "mailgun",
+    "twilio",
+    "ses",
+    "firebase",
+    "postmark",
+    "twitter"
+  ],
   "require": {
-    "php": ">=5.4.0",
-    "guzzlehttp/guzzle": "~5.0",
-    "guzzlehttp/retry-subscriber": "1.0.*@dev"
+    "php": ">=5.5.0",
+    "guzzlehttp/guzzle": "~6.0"
+  },
+  "require-dev": {
+    "monolog/monolog": "^1.20",
+    "phpunit/phpunit": "^4.8"
   },
   "autoload": {
     "psr-4": {
@@ -19,5 +40,7 @@
     "name": "Pierre Bazoge",
     "email": "pierre@notifuse.com"
   }],
-  "minimum-stability": "stable"
+  "scripts": {
+    "test": "phpunit"
+  }
 }
