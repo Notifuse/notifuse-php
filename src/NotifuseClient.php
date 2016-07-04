@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
 
 class NotifuseClient
 {
-    public static $VERSION = '2.0.0';
+    public static $VERSION = '2.0.1';
 
     protected $api_key = NULL;
 
